@@ -1,0 +1,39 @@
+import CoolProp.CoolProp as CP
+
+def calcular_propiedades_vapor_saturado(presion):
+    temperatura = CP.PropsSI('T', 'P', presion * 1000, 'Q', 1)
+    if temperatura is not None:
+        temperatura -= 273.15  # Temperatura en °C
+    else:
+        temperatura = None
+
+    calor_latente = CP.PropsSI('H', 'P', presion * 1000, 'Q', 1)
+    entalpia_vapor = CP.PropsSI('H', 'P', presion * 1000, 'Q', 1)
+    entalpia_agua = CP.PropsSI('H', 'P', presion * 1000, 'Q', 0)
+    volumen_vapor = CP.PropsSI('D', 'P', presion * 1000, 'Q', 1)
+    volumen_agua = CP.PropsSI('D', 'P', presion * 1000, 'Q', 0)
+
+    if all(prop is not None for prop in [temperatura, calor_latente, entalpia_vapor, entalpia_agua, volumen_vapor, volumen_agua]):
+        temperatura -= 273.15  # Temperatura en °C
+        calor_latente /= 1000  # Calor latente en kJ/kg
+        entalpia_vapor /= 1000  # Entalpía específica del vapor en kJ/kg
+        entalpia_agua /= 1000  # Entalpía específica del agua en kJ/kg
+        volumen_vapor = 1 / volumen_vapor  # Volumen específico del vapor en m³/kg
+        volumen_agua = 1 / volumen_agua  # Volumen específico del agua en m³/kg
+        return temperatura, calor_latente, entalpia_vapor, entalpia_agua, volumen_vapor, volumen_agua
+    else:
+        return None, None, None, None, None, None
+
+unidad_presion = "kPa"
+presion_vapor = float(input(f"Introduce la presión del vapor sobresaturado en {unidad_presion}: "))
+temperatura_vapor, calor_latente_vapor, entalpia_vapor, entalpia_agua, volumen_vapor, volumen_agua = calcular_propiedades_vapor_saturado(presion_vapor)
+
+if temperatura_vapor is not None:
+    print(f"Temperatura del Vapor Saturado: {temperatura_vapor} °C")
+    print(f"Calor Latente del Vapor: {calor_latente_vapor} kJ/kg")
+    print(f"Entalpía Específica del Vapor Saturado: {entalpia_vapor} kJ/kg")
+    print(f"Entalpía Específica del Agua Saturada: {entalpia_agua} kJ/kg")
+    print(f"Volumen Específico del Vapor Saturado: {volumen_vapor} m³/kg")
+    print(f"Volumen Específico del Agua Saturada: {volumen_agua} m³/kg")
+else:
+    print("No se pudieron calcular las propiedades para la presión proporcionada.")
